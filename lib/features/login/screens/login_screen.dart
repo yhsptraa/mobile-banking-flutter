@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_input.dart';
+import '../../home/screens/home_screen.dart';
 import '../widgets/password_input.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -38,7 +39,7 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     PasswordInput(
                       validator: (value) {
-                        if(value == null || value.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return 'Password wajib diisi';
                         }
                         return null;
@@ -48,29 +49,30 @@ class LoginScreen extends StatelessWidget {
                     Builder(
                       builder: (buttonContext) {
                         return AppButton(
-                          label: 'Login', 
+                          label: 'Login',
                           onPressed: () {
                             FocusScope.of(buttonContext).unfocus();
 
-                            if(!Form.of(buttonContext).validate()) {
+                            if (!Form.of(buttonContext).validate()) {
                               return;
                             }
 
-                            ScaffoldMessenger.of(buttonContext).showSnackBar(
-                              const SnackBar(
-                                content: Text('Berhasil validasi data')
+                            Navigator.pushReplacement(
+                              buttonContext,
+                              MaterialPageRoute(
+                                builder: (_) => const HomeScreen(),
                               ),
                             );
                           },
                         );
-                      }
-                    )
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-        )
+        ),
       ),
     );
   }
