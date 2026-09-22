@@ -49,8 +49,24 @@ class TransferScreen extends StatelessWidget {
             width: double.infinity,
             height: 50,
             child: AppButton(
-              label: 'Kembali',
+              label: 'Bantuan',
               onPressed: () {
+                showDialog(
+                  context: context, 
+                  builder: (context) => AlertDialog(
+                    title: const Text('Petunjuk layanan transfer'),
+                    content: const Text(
+                      'Transfer rekening baru: Anda dapat memasukkan nomor rekening yang belum pernah terdaftar sebelumnya' '\n\n'
+                      'Transfer rekening lama: Anda dapat mentransfer ke nomor rekening yang pernah terdaftar sebelumnya'
+                    ),
+                    actions: [
+                      AppButton(
+                        label: 'Mengerti', 
+                        onPressed: () => Navigator.pop(context)
+                      )
+                    ],
+                  )
+                );
               },
             ),
           ),
