@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/app_button.dart';
+import '../../transfer/screens/input_rekening_screen.dart';
 
-class TransferScreen extends StatelessWidget {
+class TransferScreen extends StatefulWidget {
   const TransferScreen({super.key});
+  @override
+  State<TransferScreen> createState() => _TransferScreenState();
+}
+
+class _TransferScreenState extends State<TransferScreen> {
+  final List<Map<String, String>> _savedAccounts = [];
+
+  void _navigateToInputRekening() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (
+          context
+        ) => const InputRekeningScreen()
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        _savedAccounts.add(result);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Rekening berhasil disimpan')
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +55,7 @@ class TransferScreen extends StatelessWidget {
             child: ListTile(
               title: const Text('Transfer rekening baru'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                //TODO: Navigasi ke halaman input rekening
-              },
+              onTap: _navigateToInputRekening,
             ),
           ),
 
