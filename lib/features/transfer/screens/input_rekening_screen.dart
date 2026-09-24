@@ -2,10 +2,23 @@ import 'package:flutter/material.dart';
 import '../widgets/input_rekening.dart';
 import '../widgets/confirm_button_rekening.dart';
 
-class InputRekeningScreen extends StatelessWidget {
+class InputRekeningScreen extends StatefulWidget {
   const InputRekeningScreen({
     super.key
   });
+  @override
+  State<InputRekeningScreen> createState() => _InputRekeningScreenState();
+}
+
+class _InputRekeningScreenState extends State<InputRekeningScreen> {
+  final _nameController = TextEditingController();
+  final _accountController = TextEditingController();
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _accountController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +36,16 @@ class InputRekeningScreen extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            const InputRekening(),
+            InputRekening(
+              nameController: _nameController,
+              accountController: _accountController,
+            ),
             const Spacer(),
             ConfirmButtonRekening(
-              onPressed: () {
-                // TODO: Simpan rekening dan kembali ke transfer_screen
+              nameController: _nameController,
+              accountController: _accountController,
+              onConfirmed: (data) {
+                Navigator.pop(context, data);
               },
             ),
           ],

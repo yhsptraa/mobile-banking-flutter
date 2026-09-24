@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../core/widgets/app_input.dart';
 
 class InputRekening extends StatelessWidget {
+    final TextEditingController nameController;
+    final TextEditingController accountController;
+
     const InputRekening({
-        super.key
+      super.key,
+      required this.nameController,
+      required this.accountController,
     });
 
     @override
@@ -13,12 +18,15 @@ class InputRekening extends StatelessWidget {
             children: [
                 AppInput(
                 label: 'Nama pemilik rekening',
+                controller: nameController,
                 ),
                 const SizedBox(
                     height: 16
                 ),
                 AppInput(
                 label: 'Nomor rekening tujuan',
+                controller: accountController,
+                keyboardType: TextInputType.number,
                 ),
             ],
         );
