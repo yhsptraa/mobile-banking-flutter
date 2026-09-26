@@ -61,8 +61,10 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: HomeBottomBar(
-        onTransferTap: () => _transfers(context),
-        onTransactionTap: () => _transactions(context),
+        homePage: () {},
+        transferPage: () => _transfers(context),
+        transactionHistoryPage: () => _transactions(context),
+        profilePage: () => _profile(context),
       ),
       floatingActionButton: QrisButton(
         onPressed: () => _qris(context),
