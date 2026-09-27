@@ -7,6 +7,7 @@ import '../widgets/bottom_navbar.dart';
 
 import '../../profile/screens/profile_screen.dart';
 import '../../transfer/screens/transfer_screen.dart';
+import '../../transaction/screens/transaction_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -26,11 +27,13 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _transactions(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const TempScreen()),
-    );
-  }
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const TransactionScreen(),
+    ),
+  );
+}
 
   void _qris(BuildContext context) {
     ScaffoldMessenger.of(
