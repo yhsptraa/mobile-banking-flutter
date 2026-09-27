@@ -4,12 +4,16 @@ import '../../../core/theme/app_colors.dart';
 class HomeBottomBar extends StatelessWidget {
   const HomeBottomBar({
     super.key,
-    required this.onTransferTap,
-    required this.onTransactionTap,
+    required this.homePage,
+    required this.transferPage,
+    required this.transactionHistoryPage,
+    required this.profilePage,
   });
 
-  final VoidCallback onTransferTap;
-  final VoidCallback onTransactionTap;
+  final VoidCallback homePage;
+  final VoidCallback transferPage;
+  final VoidCallback transactionHistoryPage;
+  final VoidCallback profilePage;
 
   @override
   Widget build(BuildContext context) {
@@ -24,16 +28,25 @@ class HomeBottomBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           BottomBarItem(
+            icon: Icons.home,
+            label: "Home",
+            onTap: homePage,
+          ),
+          BottomBarItem(
             icon: Icons.send_outlined,
             label: 'Transfer',
-            onTap: onTransferTap,
+            onTap: transferPage,
           ),
           const SizedBox(width: 72),
           BottomBarItem(
             icon: Icons.receipt_long_outlined,
-            label: 'Transaksi',
-            onTap: onTransactionTap,
+            label: 'History',
+            onTap: transactionHistoryPage,
           ),
+          BottomBarItem(
+            icon: Icons.person, 
+            label: "Profile", 
+            onTap: profilePage)
         ],
       ),
     );

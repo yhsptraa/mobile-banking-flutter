@@ -19,6 +19,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  void _notifications(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const TempScreen()),
+    );
+  }
+
   void _transfers(BuildContext context) {
     Navigator.push(
       context,
@@ -47,13 +54,17 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       extendBody: true,
       body: SafeArea(
+        bottom: false,
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: HomeHeader(onProfileTap: () => _profile(context)),
+              child: HomeHeader(
+                profilePage: () => _profile(context),
+                notificationPage: () => _notifications(context),
+                ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
               sliver: SliverList.list(
                 children: [
                   const BalanceCard()
@@ -64,8 +75,10 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: HomeBottomBar(
-        onTransferTap: () => _transfers(context),
-        onTransactionTap: () => _transactions(context),
+        homePage: () {},
+        transferPage: () => _transfers(context),
+        transactionHistoryPage: () => _transactions(context),
+        profilePage: () => _profile(context),
       ),
       floatingActionButton: QrisButton(
         onPressed: () => _qris(context),
@@ -79,6 +92,12 @@ class TempScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: const Center(child: Text('On Going')));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(''),
+      ),
+      body: const Center(child: Text('On Going')
+      ),
+    );
   }
 }
