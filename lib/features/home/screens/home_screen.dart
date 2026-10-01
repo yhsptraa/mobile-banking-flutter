@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../widgets/home_header.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/bottom_navbar.dart';
+import '../widgets/quick_menu.dart';
 
 import '../../profile/screens/profile_screen.dart';
 import '../../transfer/screens/transfer_screen.dart';
@@ -67,7 +68,9 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
               sliver: SliverList.list(
                 children: [
-                  const BalanceCard()
+                  const BalanceCard(),
+                  SizedBox(height: 16,),
+                  const  QuickMenu()
                 ],
               ),
             ),

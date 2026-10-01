@@ -35,7 +35,7 @@ class _BalanceCardState extends State<BalanceCard> {
             children: [
               Text(
                 'Balance',
-                style: TextStyle(color: AppColors.textWhite, fontSize: 14),
+                style: TextStyle(color: AppColors.textWhite, fontSize: 21),
               ),
             ],
           ),
@@ -44,7 +44,7 @@ class _BalanceCardState extends State<BalanceCard> {
             children: [
               Expanded(
                 child: Text(
-                  _isBalanceVisible ? 'Rp.100.000.000' : 'Rp. •••••••••',
+                  _isBalanceVisible ? 'Rp.100.000.000' : 'Rp. *******',
                   style: TextStyle(
                     color: AppColors.textWhite,
                     fontSize: 28,
