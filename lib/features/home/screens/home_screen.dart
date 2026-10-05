@@ -8,6 +8,7 @@ import '../widgets/quick_menu.dart';
 
 import '../../profile/screens/profile_screen.dart';
 import '../../transfer/screens/transfer_screen.dart';
+import '../../qris/qris.dart';
 import '../../transaction/screens/transaction_screen.dart';
 import '../../notification/screens/notification_screen.dart';
 
@@ -45,9 +46,10 @@ class HomeScreen extends StatelessWidget {
 }
 
   void _qris(BuildContext context) {
-    ScaffoldMessenger.of(
+    Navigator.push(
       context,
-    ).showSnackBar(const SnackBar(content: Text('fitur akan segera tersedia')));
+      MaterialPageRoute(builder: (_) => const QrisScreen()),
+    );
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../qris/qris.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -9,6 +10,7 @@ class TransactionScreen extends StatefulWidget {
 
 class _TransactionScreenState extends State<TransactionScreen> {
   String selectedFilter = 'Semua';
+  int saldo = 100000000;
 
   final List<Map<String, dynamic>> transactions = [
     {
@@ -57,11 +59,114 @@ class _TransactionScreenState extends State<TransactionScreen> {
     return transactions;
   }
 
+  Future<void> bukaQris() async {
+    final isiQr = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const QrisScreen(),
+      ),
+    );
+
+    if (!mounted || isiQr == null) return;
+
+    final nominalController = TextEditingController();
+
+    final nominal = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Pembayaran QRIS'),
+          content: TextField(
+            controller: nominalController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Nominal pembayaran',
+              prefixText: 'Rp ',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final angka = int.tryParse(
+                  nominalController.text
+                      .replaceAll('.', '')
+                      .replaceAll(',', ''),
+                );
+
+                if (angka == null || angka <= 0) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    const SnackBar(
+                      content: Text('Masukkan nominal yang benar.'),
+                    ),
+                  );
+                  return;
+                }
+
+                if (angka > saldo) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    const SnackBar(
+                      content: Text('Saldo tidak mencukupi.'),
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.pop(dialogContext, angka);
+              },
+              child: const Text('Bayar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    nominalController.dispose();
+
+    if (nominal == null || !mounted) return;
+
+    final sekarang = DateTime.now();
+    final jam =
+        '${sekarang.hour.toString().padLeft(2, '0')}:'
+        '${sekarang.minute.toString().padLeft(2, '0')}';
+
+    setState(() {
+      saldo -= nominal;
+
+      transactions.insert(0, {
+        'title': 'Pembayaran QRIS',
+        'subtitle': 'QRIS',
+        'amount': '- Rp ${formatRupiah(nominal)}',
+        'time': jam,
+        'isIncome': false,
+        'qrData': isiQr,
+      });
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Transaksi QRIS ditambahkan ke riwayat.'),
+      ),
+    );
+  }
+
+  String formatRupiah(int angka) {
+    return angka.toString().replaceAllMapped(
+          RegExp(r'\B(?=(\d{3})+(?!\d))'),
+          (cocok) => '.',
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
-
       appBar: AppBar(
         title: const Text(
           'Riwayat Transaksi',
@@ -71,13 +176,17 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: 'Scan QRIS',
+            onPressed: bukaQris,
+            icon: const Icon(Icons.qr_code_scanner),
+          ),
+        ],
       ),
-
       body: Column(
         children: [
-          // ==========================
           // SALDO
-          // ==========================
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
@@ -88,20 +197,20 @@ class _TransactionScreenState extends State<TransactionScreen> {
                 bottomRight: Radius.circular(25),
               ),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Saldo Anda',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Rp 5.750.000',
-                  style: TextStyle(
+                  'Rp ${formatRupiah(saldo)}',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -111,9 +220,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
             ),
           ),
 
-          // ==========================
-          // FILTER BY
-          // ==========================
+          // FILTER
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
             child: Row(
@@ -125,14 +232,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(width: 15),
-
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -140,12 +243,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
                         color: Colors.grey.shade300,
                       ),
                     ),
-
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: selectedFilter,
                         isExpanded: true,
-
                         items: const [
                           DropdownMenuItem(
                             value: 'Semua',
@@ -160,10 +261,11 @@ class _TransactionScreenState extends State<TransactionScreen> {
                             child: Text('Uang Keluar'),
                           ),
                         ],
-
                         onChanged: (value) {
+                          if (value == null) return;
+
                           setState(() {
-                            selectedFilter = value!;
+                            selectedFilter = value;
                           });
                         },
                       ),
@@ -174,9 +276,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
             ),
           ),
 
-          // ==========================
           // LIST TRANSAKSI
-          // ==========================
           Expanded(
             child: filteredTransactions.isEmpty
                 ? const Center(
@@ -192,8 +292,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                     padding: const EdgeInsets.all(16),
                     itemCount: filteredTransactions.length,
                     itemBuilder: (context, index) {
-                      final transaction =
-                          filteredTransactions[index];
+                      final transaction = filteredTransactions[index];
 
                       return TransactionItem(
                         title: transaction['title'],
@@ -210,10 +309,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
     );
   }
 }
-
-// =====================================================
-// TRANSACTION ITEM
-// =====================================================
 
 class TransactionItem extends StatelessWidget {
   final String title;
@@ -236,39 +331,26 @@ class TransactionItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
-
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-
       child: Padding(
         padding: const EdgeInsets.all(15),
-
         child: Row(
           children: [
-            // ICON
             Container(
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: isIncome
-                    ? Colors.green.shade50
-                    : Colors.red.shade50,
+                color: isIncome ? Colors.green.shade50 : Colors.red.shade50,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                isIncome
-                    ? Icons.south_west
-                    : Icons.north_east,
-                color: isIncome
-                    ? Colors.green
-                    : Colors.red,
+                isIncome ? Icons.south_west : Icons.north_east,
+                color: isIncome ? Colors.green : Colors.red,
               ),
             ),
-
             const SizedBox(width: 15),
-
-            // INFORMASI
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,18 +362,14 @@ class TransactionItem extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 5),
-
                   Text(
                     subtitle,
                     style: TextStyle(
                       color: Colors.grey.shade600,
                     ),
                   ),
-
                   const SizedBox(height: 3),
-
                   Text(
                     time,
                     style: TextStyle(
@@ -302,14 +380,10 @@ class TransactionItem extends StatelessWidget {
                 ],
               ),
             ),
-
-            // NOMINAL
             Text(
               amount,
               style: TextStyle(
-                color: isIncome
-                    ? Colors.green
-                    : Colors.red,
+                color: isIncome ? Colors.green : Colors.red,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
