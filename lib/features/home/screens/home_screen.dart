@@ -9,6 +9,7 @@ import '../widgets/quick_menu.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../transfer/screens/transfer_screen.dart';
 import '../../transaction/screens/transaction_screen.dart';
+import '../../notification/screens/notification_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,7 +24,7 @@ class HomeScreen extends StatelessWidget {
   void _notifications(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const TempScreen()),
+      MaterialPageRoute(builder: (_) => const NotificationScreen()),
     );
   }
 
@@ -87,20 +88,6 @@ class HomeScreen extends StatelessWidget {
         onPressed: () => _qris(context),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-}
-class TempScreen extends StatelessWidget {
-  const TempScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(''),
-      ),
-      body: const Center(child: Text('On Going')
-      ),
     );
   }
 }
