@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_banking_application/core/theme/app_colors.dart';
+import 'package:mobile_banking_application/features/quick-menus/screens/withdrawal_screen.dart';
 
 class QuickMenu extends StatelessWidget {
   const QuickMenu({super.key});
@@ -142,23 +143,34 @@ class QuickMenu extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(16),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const WithdrawalScreen(),
                       ),
-                      child: Icon(
-                        Icons.payments_outlined,
-                        size: 28,
-                        color: AppColors.primary,
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.payments_outlined,
+                          size: 28,
+                          color: AppColors.primary,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text('Withdraw'),
-                  ],
+                      SizedBox(height: 8),
+                      Text('Withdraw'),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
