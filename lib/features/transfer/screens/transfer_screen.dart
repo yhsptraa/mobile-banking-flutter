@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/app_button.dart';
 import '../../transfer/screens/input_rekening_screen.dart';
+import '../../transfer/screens/input_nominal_screen.dart';
 
 class TransferScreen extends StatefulWidget {
   const TransferScreen({super.key});
@@ -63,9 +64,25 @@ class _TransferScreenState extends State<TransferScreen> {
             elevation: 2,
             child: ListTile(
               title: const Text('Transfer rekening lama'),
+              subtitle: Text('${_savedAccounts.length} rekening tersimpan'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                //TODO: Navigasi ke halaman input nominal
+                if (_savedAccounts.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InputNominalScreen(
+                        dataAccount: _savedAccounts.last,
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Belum ada rekening tersimpan, tambahkan rekening baru terlebih dahulu'),
+                    ),
+                  );
+                }
               },
             ),
           ),
