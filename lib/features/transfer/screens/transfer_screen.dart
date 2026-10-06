@@ -72,7 +72,7 @@ class _TransferScreenState extends State<TransferScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => InputNominalScreen(
-                        dataAccount: _savedAccounts.last,
+                        dataAccounts: _savedAccounts,
                       ),
                     ),
                   );
