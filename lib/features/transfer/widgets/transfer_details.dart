@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -39,9 +40,12 @@ class TransferDetails extends ConsumerWidget {
           children: [
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.15),
+                  color: AppColors.success.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -60,7 +64,10 @@ class TransferDetails extends ConsumerWidget {
             _buildDetailRow('Nama Penerima', recipientName),
             _buildDetailRow('Catatan/Berita', message),
             const Divider(color: AppColors.border),
-            _buildDetailRow('Nominal Transfer', 'Rp ${amount.toStringAsFixed(0)}'),
+            _buildDetailRow(
+              'Nominal Transfer',
+              'Rp ${amount.toStringAsFixed(0)}',
+            ),
             _buildDetailRow('Biaya Admin', 'Rp ${adminFee.toStringAsFixed(0)}'),
             const Divider(color: AppColors.border),
             _buildDetailRow(
@@ -73,22 +80,23 @@ class TransferDetails extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildDetailRow(String label, String value, {bool isBold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: AppTextStyles.bodySmall,
-          ),
-          Text(
+          Expanded(child: Text(label, style: AppTextStyles.bodySmall)),
+          const SizedBox(width: 8),
+          Flexible(child: Text(
             value,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
             style: isBold
                 ? AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold)
                 : AppTextStyles.bodyMedium,
-          ),
+          )),
         ],
       ),
     );
