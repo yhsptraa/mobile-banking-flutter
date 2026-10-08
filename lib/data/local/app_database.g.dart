@@ -59,6 +59,28 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserModel> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _phoneNumberMeta = const VerificationMeta(
+    'phoneNumber',
+  );
+  @override
+  late final GeneratedColumn<String> phoneNumber = GeneratedColumn<String>(
+    'phone_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _profileImagePathMeta = const VerificationMeta(
+    'profileImagePath',
+  );
+  @override
+  late final GeneratedColumn<String> profileImagePath = GeneratedColumn<String>(
+    'profile_image_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -77,6 +99,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserModel> {
     username,
     fullName,
     passwordHash,
+    phoneNumber,
+    profileImagePath,
     createdAt,
   ];
   @override
@@ -121,6 +145,24 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserModel> {
     } else if (isInserting) {
       context.missing(_passwordHashMeta);
     }
+    if (data.containsKey('phone_number')) {
+      context.handle(
+        _phoneNumberMeta,
+        phoneNumber.isAcceptableOrUnknown(
+          data['phone_number']!,
+          _phoneNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('profile_image_path')) {
+      context.handle(
+        _profileImagePathMeta,
+        profileImagePath.isAcceptableOrUnknown(
+          data['profile_image_path']!,
+          _profileImagePathMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -152,6 +194,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, UserModel> {
         DriftSqlType.string,
         data['${effectivePrefix}password_hash'],
       )!,
+      phoneNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone_number'],
+      ),
+      profileImagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_image_path'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -170,12 +220,16 @@ class UserModel extends DataClass implements Insertable<UserModel> {
   final String username;
   final String fullName;
   final String passwordHash;
+  final String? phoneNumber;
+  final String? profileImagePath;
   final DateTime createdAt;
   const UserModel({
     required this.id,
     required this.username,
     required this.fullName,
     required this.passwordHash,
+    this.phoneNumber,
+    this.profileImagePath,
     required this.createdAt,
   });
   @override
@@ -185,6 +239,12 @@ class UserModel extends DataClass implements Insertable<UserModel> {
     map['username'] = Variable<String>(username);
     map['full_name'] = Variable<String>(fullName);
     map['password_hash'] = Variable<String>(passwordHash);
+    if (!nullToAbsent || phoneNumber != null) {
+      map['phone_number'] = Variable<String>(phoneNumber);
+    }
+    if (!nullToAbsent || profileImagePath != null) {
+      map['profile_image_path'] = Variable<String>(profileImagePath);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -195,6 +255,12 @@ class UserModel extends DataClass implements Insertable<UserModel> {
       username: Value(username),
       fullName: Value(fullName),
       passwordHash: Value(passwordHash),
+      phoneNumber: phoneNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phoneNumber),
+      profileImagePath: profileImagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(profileImagePath),
       createdAt: Value(createdAt),
     );
   }
@@ -209,6 +275,8 @@ class UserModel extends DataClass implements Insertable<UserModel> {
       username: serializer.fromJson<String>(json['username']),
       fullName: serializer.fromJson<String>(json['fullName']),
       passwordHash: serializer.fromJson<String>(json['passwordHash']),
+      phoneNumber: serializer.fromJson<String?>(json['phoneNumber']),
+      profileImagePath: serializer.fromJson<String?>(json['profileImagePath']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -220,6 +288,8 @@ class UserModel extends DataClass implements Insertable<UserModel> {
       'username': serializer.toJson<String>(username),
       'fullName': serializer.toJson<String>(fullName),
       'passwordHash': serializer.toJson<String>(passwordHash),
+      'phoneNumber': serializer.toJson<String?>(phoneNumber),
+      'profileImagePath': serializer.toJson<String?>(profileImagePath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -229,12 +299,18 @@ class UserModel extends DataClass implements Insertable<UserModel> {
     String? username,
     String? fullName,
     String? passwordHash,
+    Value<String?> phoneNumber = const Value.absent(),
+    Value<String?> profileImagePath = const Value.absent(),
     DateTime? createdAt,
   }) => UserModel(
     id: id ?? this.id,
     username: username ?? this.username,
     fullName: fullName ?? this.fullName,
     passwordHash: passwordHash ?? this.passwordHash,
+    phoneNumber: phoneNumber.present ? phoneNumber.value : this.phoneNumber,
+    profileImagePath: profileImagePath.present
+        ? profileImagePath.value
+        : this.profileImagePath,
     createdAt: createdAt ?? this.createdAt,
   );
   UserModel copyWithCompanion(UsersCompanion data) {
@@ -245,6 +321,12 @@ class UserModel extends DataClass implements Insertable<UserModel> {
       passwordHash: data.passwordHash.present
           ? data.passwordHash.value
           : this.passwordHash,
+      phoneNumber: data.phoneNumber.present
+          ? data.phoneNumber.value
+          : this.phoneNumber,
+      profileImagePath: data.profileImagePath.present
+          ? data.profileImagePath.value
+          : this.profileImagePath,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -256,14 +338,23 @@ class UserModel extends DataClass implements Insertable<UserModel> {
           ..write('username: $username, ')
           ..write('fullName: $fullName, ')
           ..write('passwordHash: $passwordHash, ')
+          ..write('phoneNumber: $phoneNumber, ')
+          ..write('profileImagePath: $profileImagePath, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, username, fullName, passwordHash, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    username,
+    fullName,
+    passwordHash,
+    phoneNumber,
+    profileImagePath,
+    createdAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -272,6 +363,8 @@ class UserModel extends DataClass implements Insertable<UserModel> {
           other.username == this.username &&
           other.fullName == this.fullName &&
           other.passwordHash == this.passwordHash &&
+          other.phoneNumber == this.phoneNumber &&
+          other.profileImagePath == this.profileImagePath &&
           other.createdAt == this.createdAt);
 }
 
@@ -280,12 +373,16 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
   final Value<String> username;
   final Value<String> fullName;
   final Value<String> passwordHash;
+  final Value<String?> phoneNumber;
+  final Value<String?> profileImagePath;
   final Value<DateTime> createdAt;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.username = const Value.absent(),
     this.fullName = const Value.absent(),
     this.passwordHash = const Value.absent(),
+    this.phoneNumber = const Value.absent(),
+    this.profileImagePath = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   UsersCompanion.insert({
@@ -293,6 +390,8 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
     required String username,
     required String fullName,
     required String passwordHash,
+    this.phoneNumber = const Value.absent(),
+    this.profileImagePath = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : username = Value(username),
        fullName = Value(fullName),
@@ -302,6 +401,8 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
     Expression<String>? username,
     Expression<String>? fullName,
     Expression<String>? passwordHash,
+    Expression<String>? phoneNumber,
+    Expression<String>? profileImagePath,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -309,6 +410,8 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
       if (username != null) 'username': username,
       if (fullName != null) 'full_name': fullName,
       if (passwordHash != null) 'password_hash': passwordHash,
+      if (phoneNumber != null) 'phone_number': phoneNumber,
+      if (profileImagePath != null) 'profile_image_path': profileImagePath,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -318,6 +421,8 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
     Value<String>? username,
     Value<String>? fullName,
     Value<String>? passwordHash,
+    Value<String?>? phoneNumber,
+    Value<String?>? profileImagePath,
     Value<DateTime>? createdAt,
   }) {
     return UsersCompanion(
@@ -325,6 +430,8 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,
       passwordHash: passwordHash ?? this.passwordHash,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      profileImagePath: profileImagePath ?? this.profileImagePath,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -344,6 +451,12 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
     if (passwordHash.present) {
       map['password_hash'] = Variable<String>(passwordHash.value);
     }
+    if (phoneNumber.present) {
+      map['phone_number'] = Variable<String>(phoneNumber.value);
+    }
+    if (profileImagePath.present) {
+      map['profile_image_path'] = Variable<String>(profileImagePath.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -357,6 +470,8 @@ class UsersCompanion extends UpdateCompanion<UserModel> {
           ..write('username: $username, ')
           ..write('fullName: $fullName, ')
           ..write('passwordHash: $passwordHash, ')
+          ..write('phoneNumber: $phoneNumber, ')
+          ..write('profileImagePath: $profileImagePath, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1211,6 +1326,8 @@ typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   required String username,
   required String fullName,
   required String passwordHash,
+  Value<String?> phoneNumber,
+  Value<String?> profileImagePath,
   Value<DateTime> createdAt,
 });
 typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
@@ -1218,6 +1335,8 @@ typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
   Value<String> username,
   Value<String> fullName,
   Value<String> passwordHash,
+  Value<String?> phoneNumber,
+  Value<String?> profileImagePath,
   Value<DateTime> createdAt,
 });
 
@@ -1269,6 +1388,16 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<String> get passwordHash => $composableBuilder(
     column: $table.passwordHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phoneNumber => $composableBuilder(
+    column: $table.phoneNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get profileImagePath => $composableBuilder(
+    column: $table.profileImagePath,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1332,6 +1461,16 @@ class $$UsersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get phoneNumber => $composableBuilder(
+    column: $table.phoneNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get profileImagePath => $composableBuilder(
+    column: $table.profileImagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -1358,6 +1497,16 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<String> get passwordHash => $composableBuilder(
     column: $table.passwordHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get phoneNumber => $composableBuilder(
+    column: $table.phoneNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get profileImagePath => $composableBuilder(
+    column: $table.profileImagePath,
     builder: (column) => column,
   );
 
@@ -1422,12 +1571,16 @@ class $$UsersTableTableManager
                 Value<String> username = const Value.absent(),
                 Value<String> fullName = const Value.absent(),
                 Value<String> passwordHash = const Value.absent(),
+                Value<String?> phoneNumber = const Value.absent(),
+                Value<String?> profileImagePath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => UsersCompanion(
                 id: id,
                 username: username,
                 fullName: fullName,
                 passwordHash: passwordHash,
+                phoneNumber: phoneNumber,
+                profileImagePath: profileImagePath,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -1436,12 +1589,16 @@ class $$UsersTableTableManager
                 required String username,
                 required String fullName,
                 required String passwordHash,
+                Value<String?> phoneNumber = const Value.absent(),
+                Value<String?> profileImagePath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => UsersCompanion.insert(
                 id: id,
                 username: username,
                 fullName: fullName,
                 passwordHash: passwordHash,
+                phoneNumber: phoneNumber,
+                profileImagePath: profileImagePath,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

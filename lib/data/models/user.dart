@@ -9,6 +9,9 @@ class Users extends Table {
   TextColumn get fullName => text()();
 
   TextColumn get passwordHash => text()();
+  
+  TextColumn get phoneNumber => text().nullable()(); 
+  TextColumn get profileImagePath => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime().clientDefault(DateTime.now)();
 }
