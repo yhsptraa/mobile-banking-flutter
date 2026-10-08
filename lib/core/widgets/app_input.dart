@@ -8,6 +8,7 @@ class AppInput extends StatelessWidget {
     this.validator,
     this.controller,
     this.keyboardType,
+    this.enabled = true, // Tambahkan parameter enabled
   });
 
   final String label;
@@ -15,6 +16,7 @@ class AppInput extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
+  final bool enabled; // Deklarasikan variabel enabled
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,12 @@ class AppInput extends StatelessWidget {
       autocorrect: !isPassword,
       enableSuggestions: !isPassword,
       validator: validator,
-      decoration: InputDecoration(labelText: label),
+      keyboardType: keyboardType, // Tambahkan ini agar format keyboard sesuai
+      enabled: enabled, // Terapkan parameter enabled
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
     );
   }
 }
