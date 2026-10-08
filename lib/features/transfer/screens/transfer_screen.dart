@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/app_button.dart';
 import '../../transfer/screens/input_rekening_screen.dart';
 import '../../transfer/screens/input_nominal_screen.dart';
 
-class TransferScreen extends StatefulWidget {
+class TransferScreen extends ConsumerStatefulWidget {
   const TransferScreen({super.key});
   @override
-  State<TransferScreen> createState() => _TransferScreenState();
+  ConsumerState<TransferScreen> createState() => _TransferScreenState();
 }
 
-class _TransferScreenState extends State<TransferScreen> {
+class _TransferScreenState extends ConsumerState<TransferScreen> {
   final List<Map<String, String>> _savedAccounts = [];
 
   void _navigateToInputRekening() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (
-          context
-        ) => const InputRekeningScreen()
+        builder: (context) => const InputRekeningScreen(),
       ),
     );
     if (result != null) {
@@ -27,10 +26,9 @@ class _TransferScreenState extends State<TransferScreen> {
         _savedAccounts.add(result);
       });
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Rekening berhasil disimpan')
-        ),
+        const SnackBar(content: Text('Rekening berhasil disimpan')),
       );
     }
   }
@@ -40,7 +38,7 @@ class _TransferScreenState extends State<TransferScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transfer'),
-        backgroundColor: Colors.blue[900], 
+        backgroundColor: Colors.blue[900],
         foregroundColor: Colors.white,
       ),
       body: ListView(
@@ -50,7 +48,6 @@ class _TransferScreenState extends State<TransferScreen> {
             'Pilih layanan transfer',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-
           Card(
             elevation: 2,
             child: ListTile(
@@ -59,7 +56,6 @@ class _TransferScreenState extends State<TransferScreen> {
               onTap: _navigateToInputRekening,
             ),
           ),
-
           Card(
             elevation: 2,
             child: ListTile(
@@ -79,16 +75,16 @@ class _TransferScreenState extends State<TransferScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Belum ada rekening tersimpan, tambahkan rekening baru terlebih dahulu'),
+                      content: Text(
+                        'Belum ada rekening tersimpan, tambahkan rekening baru terlebih dahulu',
+                      ),
                     ),
                   );
                 }
               },
             ),
           ),
-          
           const SizedBox(height: 48),
-
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -96,20 +92,20 @@ class _TransferScreenState extends State<TransferScreen> {
               label: 'Bantuan',
               onPressed: () {
                 showDialog(
-                  context: context, 
+                  context: context,
                   builder: (context) => AlertDialog(
                     title: const Text('Petunjuk layanan transfer'),
                     content: const Text(
-                      'Transfer rekening baru: Anda dapat memasukkan nomor rekening yang belum pernah terdaftar sebelumnya' '\n\n'
-                      'Transfer rekening lama: Anda dapat mentransfer ke nomor rekening yang pernah terdaftar sebelumnya'
+                      'Transfer rekening baru: Anda dapat memasukkan nomor rekening yang belum pernah terdaftar sebelumnya\n\n'
+                      'Transfer rekening lama: Anda dapat mentransfer ke nomor rekening yang pernah terdaftar sebelumnya',
                     ),
                     actions: [
                       AppButton(
-                        label: 'Mengerti', 
-                        onPressed: () => Navigator.pop(context)
+                        label: 'Mengerti',
+                        onPressed: () => Navigator.pop(context),
                       )
                     ],
-                  )
+                  ),
                 );
               },
             ),

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/input_rekening.dart';
 import '../widgets/confirm_button_rekening.dart';
 
-class InputRekeningScreen extends StatefulWidget {
-  const InputRekeningScreen({
-    super.key
-  });
+class InputRekeningScreen extends ConsumerStatefulWidget {
+  const InputRekeningScreen({super.key});
   @override
-  State<InputRekeningScreen> createState() => _InputRekeningScreenState();
+  ConsumerState<InputRekeningScreen> createState() => _InputRekeningScreenState();
 }
 
-class _InputRekeningScreenState extends State<InputRekeningScreen> {
+class _InputRekeningScreenState extends ConsumerState<InputRekeningScreen> {
   final _nameController = TextEditingController();
   final _accountController = TextEditingController();
   @override
@@ -54,4 +53,3 @@ class _InputRekeningScreenState extends State<InputRekeningScreen> {
     );
   }
 }
-
