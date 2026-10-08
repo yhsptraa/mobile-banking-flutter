@@ -10,8 +10,7 @@ class QrisScreen extends StatefulWidget {
 }
 
 class _QrisScreenState extends State<QrisScreen> {
-  final MobileScannerController scannerController =
-      MobileScannerController(
+  final MobileScannerController scannerController = MobileScannerController(
     formats: const [BarcodeFormat.qrCode],
   );
 
@@ -19,30 +18,36 @@ class _QrisScreenState extends State<QrisScreen> {
   bool sudahDibaca = false;
 
   void kirimHasil(String? isiQr) {
-    if (sudahDibaca || isiQr == null || isiQr.isEmpty) return;
+    if (!mounted || sudahDibaca || isiQr == null || isiQr.isEmpty) return;
 
     sudahDibaca = true;
     Navigator.pop(context, isiQr);
   }
 
   Future<void> pilihDariGaleri() async {
-    final gambar = await imagePicker.pickImage(
-      source: ImageSource.gallery,
-    );
+    try {
+      final gambar = await imagePicker.pickImage(source: ImageSource.gallery);
 
-    if (gambar == null) return;
+      if (!mounted || gambar == null) return;
 
-    final hasil = await scannerController.analyzeImage(gambar.path);
-    final daftarBarcode = hasil?.barcodes ?? [];
+      final hasil = await scannerController.analyzeImage(gambar.path);
+      final daftarBarcode = hasil?.barcodes ?? [];
 
-    if (daftarBarcode.isNotEmpty) {
-      kirimHasil(daftarBarcode.first.rawValue);
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('QR tidak ditemukan di gambar.'),
-        ),
-      );
+      if (daftarBarcode.isNotEmpty) {
+        kirimHasil(daftarBarcode.first.rawValue);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('QR tidak ditemukan di gambar.')),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal membaca gambar QR. Coba kembali.'),
+          ),
+        );
+      }
     }
   }
 
