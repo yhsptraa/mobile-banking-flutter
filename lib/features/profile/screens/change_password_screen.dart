@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/widgets/app_input.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../data/repositories/user_repository.dart';
-import '../../../data/local/app_database.dart';
+import '../../../state/session_controller.dart';
 
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() =>
+      _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  // State untuk toggle ikon mata (show/hide password)
+  bool _obscureOldPassword = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
 
   bool _isLoading = false;
-  final int _currentUserId = 1;
 
   @override
   void dispose() {
@@ -30,20 +35,23 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   }
 
   Future<void> _updatePassword() async {
+    if (_isLoading) return;
     final oldPassword = _oldPasswordController.text;
     final newPassword = _newPasswordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
     if (oldPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Semua kolom harus diisi')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Semua kolom harus diisi')));
       return;
     }
 
     if (newPassword != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password baru dan konfirmasi tidak cocok')),
+        const SnackBar(
+          content: Text('Password baru dan konfirmasi tidak cocok'),
+        ),
       );
       return;
     }
@@ -52,43 +60,33 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
     try {
       final userRepository = ref.read(userRepositoryProvider);
-      final user = await userRepository.getUserById(_currentUserId);
-
-      if (user == null) {
-        throw Exception('User tidak ditemukan');
+      final session = ref.read(sessionControllerProvider);
+      if (!session.isLoggedIn) {
+        throw StateError('Sesi berakhir. Silakan login kembali');
       }
-
-      if (user.passwordHash != oldPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password lama salah')),
-        );
-        setState(() => _isLoading = false);
+      final changed = await userRepository.changePassword(
+        userId: session.userId!,
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      if (!mounted) return;
+      if (!changed) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Password lama salah')));
         return;
       }
-
-      final updatedUser = UserModel(
-        id: user.id,
-        username: user.username,
-        fullName: user.fullName,
-        passwordHash: newPassword,
-        createdAt: user.createdAt,
-        phoneNumber: user.phoneNumber,
-        profileImagePath: user.profileImagePath,
-      );
-
-      await userRepository.upsertUser(updatedUser);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password berhasil diubah')),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengubah password: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal mengubah password: $e')));
       }
     } finally {
       if (mounted) {
@@ -115,28 +113,79 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
                 const SizedBox(height: 24),
-                
-                AppInput(
-                  label: 'Password Lama',
+
+                // Password Lama dengan ikon mata
+                TextFormField(
                   controller: _oldPasswordController,
-                  isPassword: true,
+                  obscureText: _obscureOldPassword,
+                  decoration: InputDecoration(
+                    labelText: 'Password Lama',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureOldPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureOldPassword = !_obscureOldPassword;
+                        });
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                
-                AppInput(
-                  label: 'Password Baru',
+
+                // Password Baru dengan ikon mata
+                TextFormField(
                   controller: _newPasswordController,
-                  isPassword: true,
+                  obscureText: _obscureNewPassword,
+                  decoration: InputDecoration(
+                    labelText: 'Password Baru',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureNewPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureNewPassword = !_obscureNewPassword;
+                        });
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                
-                AppInput(
-                  label: 'Konfirmasi Password Baru',
+
+                // Konfirmasi Password Baru dengan ikon mata
+                TextFormField(
                   controller: _confirmPasswordController,
-                  isPassword: true,
+                  obscureText: _obscureConfirmPassword,
+                  decoration: InputDecoration(
+                    labelText: 'Konfirmasi Password Baru',
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 48),
-                
+
                 SizedBox(
                   width: double.infinity,
                   height: 50,
