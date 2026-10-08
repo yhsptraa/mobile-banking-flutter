@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
-import '../../transfer/screens/input_rekening_screen.dart';
 import '../../transfer/screens/input_nominal_screen.dart';
+import '../../transfer/screens/input_rekening_screen.dart';
 
 class TransferScreen extends ConsumerStatefulWidget {
   const TransferScreen({super.key});
@@ -28,7 +30,10 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rekening berhasil disimpan')),
+        const SnackBar(
+          content: Text('Rekening berhasil disimpan'),
+          backgroundColor: AppColors.success,
+        ),
       );
     }
   }
@@ -36,32 +41,48 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Transfer'),
-        backgroundColor: Colors.blue[900],
-        foregroundColor: Colors.white,
+        title: const Text('Transfer', style: TextStyle(color: AppColors.textWhite)),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textWhite,
       ),
       body: ListView(
         padding: const EdgeInsets.all(24.0),
         children: [
           const Text(
             'Pilih layanan transfer',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: AppTextStyles.heading3,
           ),
+          const SizedBox(height: 12),
           Card(
-            elevation: 2,
+            elevation: 1,
+            color: AppColors.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: AppColors.border),
+            ),
             child: ListTile(
-              title: const Text('Transfer rekening baru'),
-              trailing: const Icon(Icons.chevron_right),
+              title: const Text('Transfer rekening baru', style: AppTextStyles.bodyLarge),
+              trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
               onTap: _navigateToInputRekening,
             ),
           ),
+          const SizedBox(height: 8),
           Card(
-            elevation: 2,
+            elevation: 1,
+            color: AppColors.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: AppColors.border),
+            ),
             child: ListTile(
-              title: const Text('Transfer rekening lama'),
-              subtitle: Text('${_savedAccounts.length} rekening tersimpan'),
-              trailing: const Icon(Icons.chevron_right),
+              title: const Text('Transfer rekening lama', style: AppTextStyles.bodyLarge),
+              subtitle: Text(
+                '${_savedAccounts.length} rekening tersimpan',
+                style: AppTextStyles.bodySmall,
+              ),
+              trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
               onTap: () {
                 if (_savedAccounts.isNotEmpty) {
                   Navigator.push(
@@ -78,6 +99,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                       content: Text(
                         'Belum ada rekening tersimpan, tambahkan rekening baru terlebih dahulu',
                       ),
+                      backgroundColor: AppColors.warning,
                     ),
                   );
                 }
@@ -94,10 +116,12 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Petunjuk layanan transfer'),
+                    backgroundColor: AppColors.surface,
+                    title: const Text('Petunjuk layanan transfer', style: AppTextStyles.heading3),
                     content: const Text(
-                      'Transfer rekening baru: Anda dapat memasukkan nomor rekening yang belum pernah terdaftar sebelumnya\n\n'
-                      'Transfer rekening lama: Anda dapat mentransfer ke nomor rekening yang pernah terdaftar sebelumnya',
+                      'Transfer rekening baru: Anda dapat memasukkan nomor rekening yang belum pernah terdaftar sebelumnya.\n\n'
+                      'Transfer rekening lama: Anda dapat mentransfer ke nomor rekening yang pernah terdaftar sebelumnya.',
+                      style: AppTextStyles.bodyMedium,
                     ),
                     actions: [
                       AppButton(

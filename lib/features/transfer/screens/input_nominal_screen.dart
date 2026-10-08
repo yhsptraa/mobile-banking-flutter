@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../widgets/confirm_button_nominal.dart';
 import '../widgets/input_nominal.dart';
 import '../widgets/template_nominal.dart';
-import '../widgets/confirm_button_nominal.dart';
 
 class InputNominalScreen extends ConsumerStatefulWidget {
   final List<Map<String, String>> dataAccounts;
@@ -40,8 +42,11 @@ class _InputNominalScreenState extends ConsumerState<InputNominalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Input nominal transfer'),
+        title: const Text('Input nominal transfer', style: TextStyle(color: AppColors.textWhite)),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textWhite,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -50,19 +55,32 @@ class _InputNominalScreenState extends ConsumerState<InputNominalScreen> {
           children: [
             const Text(
               'Pilih rekening tujuan',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: AppTextStyles.bodyMedium,
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<Map<String, String>>(
               value: _selectedAccount,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              dropdownColor: AppColors.surface,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: AppColors.surface,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
               ),
               items: widget.dataAccounts.map((account) {
                 return DropdownMenuItem<Map<String, String>>(
                   value: account,
-                  child: Text('${account['name']} (${account['accountNumber']})'),
+                  child: Text(
+                    '${account['name']} (${account['accountNumber']})',
+                    style: AppTextStyles.bodyMedium,
+                  ),
                 );
               }).toList(),
               onChanged: (newValue) {
@@ -78,7 +96,7 @@ class _InputNominalScreenState extends ConsumerState<InputNominalScreen> {
             const SizedBox(height: 16),
             const Text(
               'Pilihan nominal transfer',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: AppTextStyles.bodyMedium,
             ),
             const SizedBox(height: 8),
             TemplateNominal(
@@ -94,20 +112,9 @@ class _InputNominalScreenState extends ConsumerState<InputNominalScreen> {
                     content: Text(
                       'Konfirmasi transfer ke: ${transferData['name']} - Rp ${transferData['amount']}',
                     ),
-                    backgroundColor: Colors.green,
+                    backgroundColor: AppColors.success,
                   ),
                 );
-                // TODO: Navigasi ke TransferConfirmationScreen
-                /*
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TransferConfirmationScreen(
-                      transferData: transferData,
-                    ),
-                  ),
-                );
-                */
               },
             ),
           ],

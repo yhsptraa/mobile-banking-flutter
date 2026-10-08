@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
 
 class ConfirmButtonRekening extends ConsumerWidget {
@@ -22,6 +24,7 @@ class ConfirmButtonRekening extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nama pemilik rekening wajib diisi'),
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -30,6 +33,7 @@ class ConfirmButtonRekening extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nomor rekening minimal 10 digit'),
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -37,17 +41,19 @@ class ConfirmButtonRekening extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Konfirmasi simpan rekening'),
-        content: const Text(
-          'Pastikan data rekening sudah benar',
-        ),
+        backgroundColor: AppColors.surface,
+        title: const Text('Konfirmasi simpan rekening', style: AppTextStyles.heading3),
+        content: const Text('Pastikan data rekening sudah benar', style: AppTextStyles.bodyMedium),
         actions: [
-          AppButton(
-            label: 'Batal',
-            onPressed: () => Navigator.pop(context),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
           ),
-          const SizedBox(height: 8),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textWhite,
+            ),
             onPressed: () {
               Navigator.pop(dialogContext);
               onConfirmed({

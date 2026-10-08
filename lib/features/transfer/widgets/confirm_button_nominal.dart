@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 
 class ConfirmButtonNominal extends ConsumerWidget {
@@ -20,7 +21,7 @@ class ConfirmButtonNominal extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nominal transfer wajib diisi'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -29,7 +30,7 @@ class ConfirmButtonNominal extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nominal transfer minimal Rp 10.000'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;

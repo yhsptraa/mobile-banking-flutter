@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../widgets/input_rekening.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../widgets/confirm_button_rekening.dart';
+import '../widgets/input_rekening.dart';
 
 class InputRekeningScreen extends ConsumerStatefulWidget {
   const InputRekeningScreen({super.key});
@@ -22,8 +24,11 @@ class _InputRekeningScreenState extends ConsumerState<InputRekeningScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Tambahkan rekening baru'),
+        title: const Text('Tambahkan rekening baru', style: TextStyle(color: AppColors.textWhite)),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textWhite,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -32,7 +37,7 @@ class _InputRekeningScreenState extends ConsumerState<InputRekeningScreen> {
           children: [
             const Text(
               'Informasi rekening baru',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: AppTextStyles.heading3,
             ),
             const SizedBox(height: 16),
             InputRekening(
