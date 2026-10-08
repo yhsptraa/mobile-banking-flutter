@@ -35,6 +35,7 @@ class AppDatabase extends _$AppDatabase {
       }
     },
     beforeOpen: (_) async {
+      await customStatement('PRAGMA foreign_keys = ON');
       await transaction(() async {
         await _seedUser(
           username: 'admin',
@@ -68,7 +69,16 @@ class AppDatabase extends _$AppDatabase {
     required String accountNumber,
     required int balance,
   }) async {
-    final existingUser = await (select(users)..where((table) => table.username.equals(username))).getSingleOrNull();
+    // Seed identity follows the account number because usernames can be edited.
+    final seededAccount =
+        await (select(accounts)
+              ..where((table) => table.accountNumber.equals(accountNumber)))
+            .getSingleOrNull();
+    if (seededAccount != null) return;
+
+    final existingUser = await (select(
+      users,
+    )..where((table) => table.username.equals(username))).getSingleOrNull();
 
     final userId =
         existingUser?.id ??
@@ -80,7 +90,9 @@ class AppDatabase extends _$AppDatabase {
           ),
         );
 
-    final existingAccount = await (select(accounts)..where((table) => table.userId.equals(userId))).getSingleOrNull();
+    final existingAccount = await (select(
+      accounts,
+    )..where((table) => table.userId.equals(userId))).getSingleOrNull();
 
     if (existingAccount == null) {
       await into(accounts).insert(

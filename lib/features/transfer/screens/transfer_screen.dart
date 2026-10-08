@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../transfer/screens/input_nominal_screen.dart';
 import '../../transfer/screens/input_rekening_screen.dart';
+import '../../../data/repositories/transaction_repository.dart';
 
 class TransferScreen extends ConsumerStatefulWidget {
   const TransferScreen({super.key});
@@ -16,19 +17,48 @@ class TransferScreen extends ConsumerStatefulWidget {
 class _TransferScreenState extends ConsumerState<TransferScreen> {
   final List<Map<String, String>> _savedAccounts = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadPreviousRecipients();
+  }
+
+  Future<void> _loadPreviousRecipients() async {
+    try {
+      final recipients = await ref.read(previousRecipientsProvider.future);
+      if (!mounted) return;
+      setState(() {
+        for (final recipient in recipients) {
+          if (!_savedAccounts.any(
+            (item) => item['accountNumber'] == recipient['accountNumber'],
+          )) {
+            _savedAccounts.add(recipient);
+          }
+        }
+      });
+    } catch (_) {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal memuat rekening sebelumnya')),
+        );
+    }
+  }
+
   void _navigateToInputRekening() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const InputRekeningScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const InputRekeningScreen()),
     );
+    if (!mounted) return;
     if (result != null) {
       setState(() {
-        _savedAccounts.add(result);
+        if (!_savedAccounts.any(
+          (item) => item['accountNumber'] == result['accountNumber'],
+        )) {
+          _savedAccounts.add(result);
+        }
       });
 
-      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Rekening berhasil disimpan'),
@@ -43,17 +73,17 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Transfer', style: TextStyle(color: AppColors.textWhite)),
+        title: const Text(
+          'Transfer',
+          style: TextStyle(color: AppColors.textWhite),
+        ),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textWhite,
       ),
       body: ListView(
         padding: const EdgeInsets.all(24.0),
         children: [
-          const Text(
-            'Pilih layanan transfer',
-            style: AppTextStyles.heading3,
-          ),
+          const Text('Pilih layanan transfer', style: AppTextStyles.heading3),
           const SizedBox(height: 12),
           Card(
             elevation: 1,
@@ -63,8 +93,14 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
               side: const BorderSide(color: AppColors.border),
             ),
             child: ListTile(
-              title: const Text('Transfer rekening baru', style: AppTextStyles.bodyLarge),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+              title: const Text(
+                'Transfer rekening baru',
+                style: AppTextStyles.bodyLarge,
+              ),
+              trailing: const Icon(
+                Icons.chevron_right,
+                color: AppColors.textSecondary,
+              ),
               onTap: _navigateToInputRekening,
             ),
           ),
@@ -77,20 +113,25 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
               side: const BorderSide(color: AppColors.border),
             ),
             child: ListTile(
-              title: const Text('Transfer rekening lama', style: AppTextStyles.bodyLarge),
+              title: const Text(
+                'Transfer rekening lama',
+                style: AppTextStyles.bodyLarge,
+              ),
               subtitle: Text(
                 '${_savedAccounts.length} rekening tersimpan',
                 style: AppTextStyles.bodySmall,
               ),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+              trailing: const Icon(
+                Icons.chevron_right,
+                color: AppColors.textSecondary,
+              ),
               onTap: () {
                 if (_savedAccounts.isNotEmpty) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => InputNominalScreen(
-                        dataAccounts: _savedAccounts,
-                      ),
+                      builder: (context) =>
+                          InputNominalScreen(dataAccounts: _savedAccounts),
                     ),
                   );
                 } else {
@@ -117,7 +158,10 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                   context: context,
                   builder: (context) => AlertDialog(
                     backgroundColor: AppColors.surface,
-                    title: const Text('Petunjuk layanan transfer', style: AppTextStyles.heading3),
+                    title: const Text(
+                      'Petunjuk layanan transfer',
+                      style: AppTextStyles.heading3,
+                    ),
                     content: const Text(
                       'Transfer rekening baru: Anda dapat memasukkan nomor rekening yang belum pernah terdaftar sebelumnya.\n\n'
                       'Transfer rekening lama: Anda dapat mentransfer ke nomor rekening yang pernah terdaftar sebelumnya.',
@@ -127,7 +171,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                       AppButton(
                         label: 'Mengerti',
                         onPressed: () => Navigator.pop(context),
-                      )
+                      ),
                     ],
                   ),
                 );

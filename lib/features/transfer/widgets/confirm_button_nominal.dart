@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 
@@ -17,6 +18,11 @@ class ConfirmButtonNominal extends ConsumerWidget {
   void _handlePress(BuildContext context) {
     final nominalText = nominalController.text.trim();
     final nominal = int.tryParse(nominalText) ?? 0;
+    if (selectedAccount == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Pilih rekening tujuan')));
+      return;
+    }
     if (nominalText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
