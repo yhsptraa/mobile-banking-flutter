@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 
-class ConfirmButtonNominal extends StatelessWidget {
+class ConfirmButtonNominal extends ConsumerWidget {
   final TextEditingController nominalController;
   final Map<String, String>? selectedAccount;
   final Function(Map<String, String>) onConfirmed;
@@ -11,7 +13,7 @@ class ConfirmButtonNominal extends StatelessWidget {
     required this.selectedAccount,
     required this.onConfirmed,
   });
-  
+
   void _handlePress(BuildContext context) {
     final nominalText = nominalController.text.trim();
     final nominal = int.tryParse(nominalText) ?? 0;
@@ -19,7 +21,7 @@ class ConfirmButtonNominal extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nominal transfer wajib diisi'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -28,7 +30,7 @@ class ConfirmButtonNominal extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nominal transfer minimal Rp 10.000'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -42,7 +44,7 @@ class ConfirmButtonNominal extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: double.infinity,
       height: 50,

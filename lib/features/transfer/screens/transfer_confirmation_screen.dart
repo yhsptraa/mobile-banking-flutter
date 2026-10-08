@@ -1,146 +1,79 @@
 import 'package:flutter/material.dart';
-import 'transfer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_button.dart';
+import '../widgets/transfer_details.dart';
 
-class TransferConfirmationScreen extends StatelessWidget {
+class TransferConfirmationScreen extends ConsumerStatefulWidget {
   final String recipientName;
   final String bankName;
   final String accountNumber;
   final double amount;
   final double adminFee;
+  final String message;
+  final String status;
 
   const TransferConfirmationScreen({
-    Key? key,
+    super.key,
     required this.recipientName,
-    required this.bankName,
+    this.bankName = 'BCA',
     required this.accountNumber,
     required this.amount,
-    required this.adminFee,
+    this.adminFee = 0.0,
+    this.message = 'Transfer m-BCA',
+    this.status = 'TRANSAKSI BERHASIL',
   });
+  factory TransferConfirmationScreen.fromMap(Map<String, String> transferData) {
+    return TransferConfirmationScreen(
+      recipientName: transferData['name'] ?? '',
+      accountNumber: transferData['accountNumber'] ?? '',
+      amount: double.tryParse(transferData['amount'] ?? '0') ?? 0.0,
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final total = amount + adminFee;
+  ConsumerState<TransferConfirmationScreen> createState() =>
+      _TransferConfirmationScreenState();
+}
 
+class _TransferConfirmationScreenState
+    extends ConsumerState<TransferConfirmationScreen> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
-          'Konfirmasi Transfer',
-          style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          'Bukti Transaksi',
+          style: TextStyle(color: AppColors.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        flexibleSpace: Container(color: const Color(0xFF003399)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: AppColors.primary,
+        iconTheme: const IconThemeData(color: AppColors.textWhite),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'TRANSFER KE',
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      recipientName,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF003399)),
-                    ),
-                    Text(
-                      '$bankName - $accountNumber',
-                      style:
-                          const TextStyle(fontSize: 14, color: Colors.black87),
-                    ),
-                    const Divider(height: 30),
-                    _buildDetailRow(
-                        'Nominal Transfer', 'Rp ${amount.toStringAsFixed(0)}'),
-                    const SizedBox(height: 8),
-                    _buildDetailRow(
-                        'Biaya Admin', 'Rp ${adminFee.toStringAsFixed(0)}'),
-                    const Divider(height: 30),
-                    _buildDetailRow(
-                        'Total Transaksi', 'Rp ${total.toStringAsFixed(0)}',
-                        isTotal: true),
-                  ],
-                ),
-              ),
+            TransferDetails(
+              recipientName: widget.recipientName,
+              bankName: widget.bankName,
+              accountNumber: widget.accountNumber,
+              amount: widget.amount,
+              adminFee: widget.adminFee,
+              message: widget.message,
+              status: widget.status,
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: const Color(0xFF003399),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TransferScreen(
-                        transactionId: '2026091812345678',
-                        transactionDate: '18 Sep 2026, 20:15',
-                        recipientName: recipientName,
-                        bankName: bankName,
-                        accountNumber: accountNumber,
-                        amount: amount,
-                        adminFee: adminFee,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text(
-                  'LANJUTKAN',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
-              ),
+            AppButton(
+              label: 'Kirim',
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDetailRow(String title, String value, {bool isTotal = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            color: isTotal ? Colors.black : Colors.grey[700],
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-            color: isTotal ? const Color(0xFF003399) : Colors.black,
-          ),
-        ),
-      ],
     );
   }
 }
