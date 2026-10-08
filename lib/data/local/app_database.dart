@@ -11,13 +11,28 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'dummy_bank'));
 
+  AppDatabase.withExecutor(super.executor);
+
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) async {
       await migrator.createAll();
+    },
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        // Some version 1 installations already contain these columns.
+        final columns = await customSelect('PRAGMA table_info(users)').get();
+        final names = columns.map((row) => row.read<String>('name')).toSet();
+        if (!names.contains('phone_number')) {
+          await migrator.addColumn(users, users.phoneNumber);
+        }
+        if (!names.contains('profile_image_path')) {
+          await migrator.addColumn(users, users.profileImagePath);
+        }
+      }
     },
     beforeOpen: (_) async {
       await transaction(() async {
