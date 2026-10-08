@@ -3,11 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../local/app_database.dart';
 import '../local/database_provider.dart';
+import '../../state/session_controller.dart';
 
 class UserRepository {
   UserRepository(this.database);
 
   final AppDatabase database;
+
+  Stream<UserModel?> watchById(int id) {
+    return (database.select(
+      database.users,
+    )..where((table) => table.id.equals(id))).watchSingleOrNull();
+  }
 
   Future<UserModel?> findByUsername(String username) {
     final query = database.select(database.users)
@@ -58,4 +65,10 @@ class UserRepository {
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepository(ref.watch(databaseProvider));
+});
+
+final currentUserProvider = StreamProvider<UserModel?>((ref) {
+  final userId = ref.watch(sessionControllerProvider).userId;
+  if (userId == null) return Stream.value(null);
+  return ref.watch(userRepositoryProvider).watchById(userId);
 });
