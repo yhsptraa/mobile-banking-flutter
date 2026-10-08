@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_button.dart';
 import '../widgets/transfer_details.dart';
-import '../widgets/button_navigate_home.dart';
 
 class TransferConfirmationScreen extends ConsumerStatefulWidget {
   final String recipientName;
@@ -13,36 +14,45 @@ class TransferConfirmationScreen extends ConsumerStatefulWidget {
   final String status;
 
   const TransferConfirmationScreen({
-    Key? key,
+    super.key,
     required this.recipientName,
-    required this.bankName,
+    this.bankName = 'BCA',
     required this.accountNumber,
     required this.amount,
-    required this.adminFee,
+    this.adminFee = 0.0,
     this.message = 'Transfer m-BCA',
     this.status = 'TRANSAKSI BERHASIL',
-  }) : super(key: key);
+  });
+  factory TransferConfirmationScreen.fromMap(Map<String, String> transferData) {
+    return TransferConfirmationScreen(
+      recipientName: transferData['name'] ?? '',
+      accountNumber: transferData['accountNumber'] ?? '',
+      amount: double.tryParse(transferData['amount'] ?? '0') ?? 0.0,
+    );
+  }
 
   @override
-  ConsumerState<TransferConfirmationScreen> createState() => _TransferConfirmationScreenState();
+  ConsumerState<TransferConfirmationScreen> createState() =>
+      _TransferConfirmationScreenState();
 }
 
-class _TransferConfirmationScreenState extends ConsumerState<TransferConfirmationScreen> {
+class _TransferConfirmationScreenState
+    extends ConsumerState<TransferConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Bukti Transaksi',
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppColors.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF003399),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: AppColors.primary,
+        iconTheme: const IconThemeData(color: AppColors.textWhite),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
             TransferDetails(
@@ -55,7 +65,8 @@ class _TransferConfirmationScreenState extends ConsumerState<TransferConfirmatio
               status: widget.status,
             ),
             const SizedBox(height: 24),
-            ButtonNavigateHome(
+            AppButton(
+              label: 'Kirim',
               onPressed: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },

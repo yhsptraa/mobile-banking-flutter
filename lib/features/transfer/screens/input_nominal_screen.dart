@@ -5,6 +5,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../widgets/confirm_button_nominal.dart';
 import '../widgets/input_nominal.dart';
 import '../widgets/template_nominal.dart';
+import 'transfer_confirmation_screen.dart';
 
 class InputNominalScreen extends ConsumerStatefulWidget {
   final List<Map<String, String>> dataAccounts;
@@ -107,12 +108,10 @@ class _InputNominalScreenState extends ConsumerState<InputNominalScreen> {
               nominalController: _nominalController,
               selectedAccount: _selectedAccount,
               onConfirmed: (transferData) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Konfirmasi transfer ke: ${transferData['name']} - Rp ${transferData['amount']}',
-                    ),
-                    backgroundColor: AppColors.success,
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TransferConfirmationScreen.fromMap(transferData),
                   ),
                 );
               },
