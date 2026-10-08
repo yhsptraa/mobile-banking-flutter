@@ -26,8 +26,8 @@ class AppInput extends StatelessWidget {
       autocorrect: !isPassword,
       enableSuggestions: !isPassword,
       validator: validator,
-      keyboardType: keyboardType, // Tambahkan ini agar format keyboard sesuai
-      enabled: enabled, // Terapkan parameter enabled
+      keyboardType: keyboardType,
+      enabled: enabled,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),

@@ -21,7 +21,7 @@ class AppCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      clipBehavior: Clip.antiAlias, // Memastikan efek tap tidak keluar dari sudut membulat
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(

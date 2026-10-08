@@ -19,7 +19,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _isLoading = false;
-  final int _currentUserId = 1; // ID default database bawaan
+  final int _currentUserId = 1;
 
   @override
   void dispose() {
@@ -34,7 +34,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     final newPassword = _newPasswordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    // 1. Validasi Input Kosong
     if (oldPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Semua kolom harus diisi')),
@@ -42,7 +41,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       return;
     }
 
-    // 2. Validasi Konfirmasi Password Baru
     if (newPassword != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password baru dan konfirmasi tidak cocok')),
@@ -60,7 +58,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         throw Exception('User tidak ditemukan');
       }
 
-      // 3. Validasi Password Lama (Sesuai dengan database)
       if (user.passwordHash != oldPassword) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password lama salah')),
@@ -69,12 +66,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         return;
       }
 
-      // 4. Update Password Baru ke Database
       final updatedUser = UserModel(
         id: user.id,
         username: user.username,
         fullName: user.fullName,
-        passwordHash: newPassword, // Update password dengan yang baru
+        passwordHash: newPassword,
         createdAt: user.createdAt,
         phoneNumber: user.phoneNumber,
         profileImagePath: user.profileImagePath,
@@ -86,7 +82,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password berhasil diubah')),
         );
-        Navigator.pop(context); // Kembali ke halaman profil
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {

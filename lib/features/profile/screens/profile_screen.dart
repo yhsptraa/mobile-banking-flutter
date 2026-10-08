@@ -3,17 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-// Import widget UI dari folder core
 import '../../../core/widgets/app_input.dart';
 import '../../../core/widgets/app_button.dart';
 
-// Import database dan repository
 import '../../../data/repositories/user_repository.dart';
 import '../../../data/local/app_database.dart';
 
-// Import halaman login untuk rute logout dan change password
 import '../../login/screens/login_screen.dart';
 import 'change_password_screen.dart';
+import 'help_center_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -30,6 +28,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isLoading = false;
   File? _profileImage;
   UserModel? _currentUser;
+  
+  bool _isNotificationEnabled = true;
+  bool _isBiometricEnabled = false;
   
   final int _currentUserId = 1; 
 
@@ -78,7 +79,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _saveProfile() async {
     if (_currentUser == null) return;
     
-    // Validasi sederhana: pastikan username dan nomor HP tidak kosong
     if (_usernameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Username dan nomor handphone tidak boleh kosong')),
@@ -92,7 +92,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       
       final updatedUser = UserModel(
         id: _currentUser!.id,
-        username: _usernameController.text.trim(), // Mengambil nilai terbaru dari input
+        username: _usernameController.text.trim(),
         fullName: _currentUser!.fullName, 
         passwordHash: _currentUser!.passwordHash,
         createdAt: _currentUser!.createdAt,
@@ -245,7 +245,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 28),
               
-              // Username dapat diedit saat mode _isEditing aktif
+              // Username input
               IgnorePointer(
                 ignoring: !_isEditing,
                 child: Container(
@@ -261,7 +261,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 16),
               
-              // Nomor HP yang dapat diedit saat mode _isEditing aktif
               IgnorePointer(
                 ignoring: !_isEditing,
                 child: Container(
@@ -296,20 +295,75 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Card(
                   elevation: 1,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  child: ListTile(
-                    leading: const Icon(Icons.lock_outline, color: Colors.blue),
-                    title: const Text('Ubah Password'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChangePasswordScreen(),
-                        ),
-                      );
-                    },
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.lock_outline, color: Colors.blue),
+                        title: const Text('Ubah Password'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChangePasswordScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      SwitchListTile(
+                        secondary: const Icon(Icons.fingerprint, color: Colors.blue),
+                        title: const Text('Login Biometrik'),
+                        value: _isBiometricEnabled,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isBiometricEnabled = value;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                const Text(
+                  'Preferensi Aplikasi',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        secondary: const Icon(Icons.notifications_outlined, color: Colors.blue),
+                        title: const Text('Notifikasi Transaksi'),
+                        value: _isNotificationEnabled,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isNotificationEnabled = value;
+                          });
+                        },
+                      ),
+                      const Divider(height: 1),
+                      ListTile(
+                        leading: const Icon(Icons.help_outline, color: Colors.blue),
+                        title: const Text('Pusat Bantuan'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HelpCenterScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 36),
                 SizedBox(
                   width: double.infinity,
