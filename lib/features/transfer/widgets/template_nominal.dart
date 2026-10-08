@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TemplateNominal extends StatelessWidget {
+class TemplateNominal extends ConsumerWidget {
   final Function(int) onSelectedNominal;
 
   const TemplateNominal({
     super.key, 
-    required this.onSelectedNominal
+    required this.onSelectedNominal,
   });
 
   final List<int> nominalList = const [
@@ -14,11 +15,11 @@ class TemplateNominal extends StatelessWidget {
     200000,
     300000,
     500000,
-    1000000
+    1000000,
   ];
   
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,

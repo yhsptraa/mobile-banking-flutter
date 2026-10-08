@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/input_nominal.dart';
 import '../widgets/template_nominal.dart';
 import '../widgets/confirm_button_nominal.dart';
 
-class InputNominalScreen extends StatefulWidget {
+class InputNominalScreen extends ConsumerStatefulWidget {
   final List<Map<String, String>> dataAccounts;
   final Map<String, String>? initialAccount;
 
@@ -13,10 +14,10 @@ class InputNominalScreen extends StatefulWidget {
     this.initialAccount,
   });
   @override
-  State<InputNominalScreen> createState() => _InputNominalScreenState();
+  ConsumerState<InputNominalScreen> createState() => _InputNominalScreenState();
 }
 
-class _InputNominalScreenState extends State<InputNominalScreen> {
+class _InputNominalScreenState extends ConsumerState<InputNominalScreen> {
   final _nominalController = TextEditingController();
   Map<String, String>? _selectedAccount;
   @override
